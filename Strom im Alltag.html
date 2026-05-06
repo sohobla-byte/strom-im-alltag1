@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>⚡ Strom im Alltag</title>
+
+<style>
+body { font-family: Arial; background:#0f0f13; color:white; padding:20px; }
+
+.card { background:#1c1c25; padding:15px; border-radius:10px; margin-bottom:15px; }
+
+.btn { padding:10px 15px; margin-top:10px; cursor:pointer; border:none; border-radius:6px; }
+.btn-primary { background:#7c6fff; color:white; }
+.btn:disabled { opacity:0.4; cursor:not-allowed; }
+
+input { padding:10px; width:100%; margin-top:8px; }
+
+.result, .solution { display:none; margin-top:10px; padding:10px; border-radius:6px; }
+
+.result { background:#2a2a3a; }
+.solution { background:#1f3a2a; }
+
+.ok { color:lightgreen; }
+.no { color:orange; }
+</style>
+</head>
+
+<body>
+
+<h1>⚡ Strom im Alltag</h1>
+
+<!-- ================= AUFGABE ================= -->
+
+<div class="card">
+<h2>Aufgabe</h2>
+<p>Ein Gerät hat 230 V und 4 A. Berechne die Leistung.</p>
+
+<input type="number" id="input1" placeholder="Antwort in Watt">
+
+<button class="btn btn-primary" onclick="check1()">Prüfen</button>
+
+<div id="result1" class="result"></div>
+<div id="solution1" class="solution">
+✔ Lösung: P = 230 × 4 = 920 W
+</div>
+
+<button id="next1" class="btn btn-primary" disabled onclick="showQuiz()">Weiter →</button>
+</div>
+
+<!-- ================= QUIZ ================= -->
+
+<div id="quizSection" style="display:none;" class="card">
+
+<h2>Quiz</h2>
+
+<div id="quiz"></div>
+
+<button id="next2" class="btn btn-primary" disabled onclick="showExit()">Weiter →</button>
+</div>
+
+<!-- ================= EXIT ================= -->
+
+<div id="exitSection" style="display:none;" class="card">
+
+<h2>Exit Aufgabe</h2>
+
+<p>230 V und 1150 W → Stromstärke?</p>
+
+<input type="number" id="exitInput">
+
+<button class="btn btn-primary" onclick="checkExit()">Prüfen</button>
+
+<div id="exitResult" class="result"></div>
+<div id="exitSolution" class="solution">
+✔ Lösung: I = 1150 ÷ 230 = 5 A
+</div>
+
+</div>
+
+<script>
+
+// ================= AUFGABE =================
+
+function check1() {
+  const val = parseFloat(document.getElementById("input1").value);
+  const correct = 920;
+
+  const res = document.getElementById("result1");
+  const sol = document.getElementById("solution1");
+
+  res.style.display = "block";
+  sol.style.display = "block";
+
+  if (Math.abs(val - correct) < 20) {
+    res.innerHTML = "✓ Richtig!";
+    res.className = "result ok";
+  } else {
+    res.innerHTML = "✗ Nicht ganz richtig.";
+    res.className = "result no";
+  }
+
+  document.getElementById("next1").disabled = false;
+}
+
+// ================= QUIZ =================
+
+const quizData = [
+  {
+    q: "230 V × 5 A = ?",
+    a: ["1150 W", "230 W", "50 W"],
+    c: 0
+  },
+  {
+    q: "Einheit von Leistung?",
+    a: ["Volt", "Ampere", "Watt"],
+    c: 2
+  }
+];
+
+let done = 0;
+
+function showQuiz() {
+  document.getElementById("quizSection").style.display = "block";
+
+  const box = document.getElementById("quiz");
+
+  box.innerHTML = quizData.map((q, i) => `
+    <p>${q.q}</p>
+    ${q.a.map((opt, j) => `
+      <button onclick="answer(${i},${j},this)">${opt}</button>
+    `).join("")}
+  `).join("");
+}
+
+function answer(i, j, btn) {
+  const q = quizData[i];
+  if (q.done) return;
+
+  q.done = true;
+
+  const buttons = btn.parentElement.querySelectorAll("button");
+
+  buttons.forEach((b, idx) => {
+    if (idx === q.c) b.style.background = "green";
+    else if (b === btn) b.style.background = "red";
+  });
+
+  done++;
+
+  if (done === quizData.length) {
+    document.getElementById("next2").disabled = false;
+  }
+}
+
+// ================= EXIT =================
+
+function showExit() {
+  document.getElementById("exitSection").style.display = "block";
+}
+
+function checkExit() {
+  const val = parseFloat(document.getElementById("exitInput").value);
+  const correct = 5;
+
+  const res = document.getElementById("exitResult");
+  const sol = document.getElementById("exitSolution");
+
+  res.style.display = "block";
+  sol.style.display = "block";
+
+  if (Math.abs(val - correct) < 0.2) {
+    res.innerHTML = "✓ Richtig!";
+    res.className = "result ok";
+  } else {
+    res.innerHTML = "✗ Versuche es nochmal.";
+    res.className = "result no";
+  }
+}
+
+</script>
+
+</body>
+</html>
